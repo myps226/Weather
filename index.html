@@ -1,45 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <title>Simple Weather App</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f2f2f2;
-            text-align: center;
-            padding: 20px;
-        }
-
-        h1 {
-            color: #333;
-        }
-
-        input,
-        button {
-            padding: 8px;
-            font-size: 16px;
-        }
-
-        #weather {
-            margin-top: 20px;
-            background: white;
-            display: inline-block;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App - Current & Weekly Forecast</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <h1>Weather App</h1>
-    <input type="text" id="city" placeholder="Enter city name">
-    <button id="search">Get Weather</button>
-
-    <div id="weather"></div>
-
+    <div class="app">
+        <h1>Weather App</h1>
+        <div class="search-box">
+            <input type="text" id="city" placeholder="Enter city name">
+            <button onclick="searchCity()">Search</button>
+        </div>
+        <div id="current-weather"></div>
+        <div id="weather"></div>
+    </div>
     <script src="script.js"></script>
 </body>
 

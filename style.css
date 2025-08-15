@@ -1,91 +1,96 @@
-/* Reset some default styles */
 body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right, #4facfe, #00f2fe);
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', Tahoma, sans-serif;
-    background: linear-gradient(135deg, #89f7fe, #66a6ff);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 40px 20px;
+}
+
+.app {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+    text-align: center;
     color: #333;
 }
 
-/* Page title */
 h1 {
     margin-bottom: 20px;
-    font-size: 2rem;
-    color: #fff;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-/* Input and button container */
-input[type="text"] {
-    padding: 10px 15px;
-    border-radius: 25px;
-    border: none;
-    outline: none;
-    font-size: 1rem;
-    margin-right: 10px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.3s ease;
-}
-
-input[type="text"]:focus {
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-/* Button styling */
-button {
-    padding: 10px 20px;
-    border-radius: 25px;
-    border: none;
-    background-color: #4a90e2;
     color: white;
-    font-size: 1rem;
+}
+
+.search-box {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.search-box input {
+    padding: 10px;
+    width: 60%;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+}
+
+.search-box button {
+    padding: 10px 15px;
+    background: #ffcc00;
+    border: none;
+    border-radius: 5px;
     cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
+    font-weight: bold;
 }
 
-button:hover {
-    background-color: #357abd;
-    transform: scale(1.05);
+.search-box button:hover {
+    background: #ffdd33;
 }
 
-/* Weather display card */
-#weather {
-    margin-top: 30px;
+/* Current Weather Box */
+.current-weather-box {
     background: rgba(255, 255, 255, 0.9);
-    padding: 20px 30px;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    min-width: 250px;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    display: inline-block;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.current-weather-box h2 {
+    margin: 0;
+}
+
+.current-weather-box .icon {
+    font-size: 3rem;
+    margin: 10px 0;
+}
+
+/* Weekly Forecast Grid */
+.forecast-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.forecast-day {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px;
+    border-radius: 10px;
     text-align: center;
-    animation: fadeIn 0.5s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
 }
 
-/* Weather text */
-#weather h2 {
-    margin-bottom: 10px;
-    color: #4a90e2;
+.forecast-day:hover {
+    transform: translateY(-5px);
 }
 
-#weather p {
-    font-size: 1.1rem;
+.forecast-day h3 {
     margin: 5px 0;
 }
 
-/* Fade in effect */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.forecast-day .icon {
+    font-size: 2rem;
+    margin: 5px 0;
 }

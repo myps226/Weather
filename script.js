@@ -1,80 +1,95 @@
-// 1. Get references to the input, button, and display area
-const cityInput = document.getElementById('city');
-const searchBtn = document.getElementById('search');
-const weatherDiv = document.getElementById('weather');
-
-// 2. Weather code to emoji mapping
-const weatherIcons = {
-    0: "☀️", 1: "🌤️", 2: "⛅", 3: "☁️",
-    45: "🌫️", 48: "🌫️",
-    51: "🌦️", 53: "🌦️", 55: "🌧️",
-    61: "🌦️", 63: "🌧️", 65: "🌧️",
-    71: "🌨️", 73: "🌨️", 75: "❄️", 77: "❄️",
-    80: "🌦️", 81: "🌧️", 82: "🌧️",
-    85: "🌨️", 86: "❄️",
-    95: "⛈️", 96: "⛈️", 99: "⛈️"
-};
-
-// 3. Weather code to description mapping
-const weatherDescriptions = {
-    0: "Clear sky", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast",
-    45: "Fog", 48: "Depositing rime fog",
-    51: "Light drizzle", 53: "Moderate drizzle", 55: "Dense drizzle",
-    61: "Slight rain", 63: "Moderate rain", 65: "Heavy rain",
-    71: "Slight snow", 73: "Moderate snow", 75: "Heavy snow", 77: "Snow grains",
-    80: "Rain showers", 81: "Moderate rain showers", 82: "Violent rain showers",
-    85: "Slight snow showers", 86: "Heavy snow showers",
-    95: "Thunderstorm", 96: "Thunderstorm with slight hail", 99: "Thunderstorm with heavy hail"
-};
-
-// 4. Add click event to the button
-searchBtn.addEventListener('click', () => {
-    const cityName = cityInput.value.trim();
-    if (cityName === "") {
-        weatherDiv.innerHTML = "Please enter a city name.";
+async function searchCity() {
+    const city = document.getElementById("city").value.trim();
+    if (city === "") {
+        alert("Please enter a city name");
         return;
     }
-    getWeather(cityName);
-});
+    getWeather(city);
+}
 
-// 5. Function to get weather for a city
 async function getWeather(city) {
-    weatherDiv.innerHTML = "Loading...";
-
     try {
-        // Get latitude & longitude
-        const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1`;
+        // 1️⃣ Get coordinates from geocoding API
+        const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${city}`;
         const geoResponse = await fetch(geoUrl);
         const geoData = await geoResponse.json();
 
-        if (!geoData.results || geoData.results.length === 0) {
-            weatherDiv.innerHTML = "City not found.";
+        if (!geoData.results) {
+            document.getElementById("weather").innerHTML = "City not found!";
+            document.getElementById("current-weather").innerHTML = "";
             return;
         }
 
         const lat = geoData.results[0].latitude;
         const lon = geoData.results[0].longitude;
-        const placeName = geoData.results[0].name;
 
-        // Get current weather
-        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code`;
+        // 2️⃣ Get current weather
+        const currentUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`;
+        const currentResponse = await fetch(currentUrl);
+        const currentData = await currentResponse.json();
+
+        // Display Current Weather
+        const currentIcon = getWeatherIcon(currentData.current_weather.weathercode);
+        const currentHtml = `
+            <div class="current-weather-box">
+                <h2>${geoData.results[0].name}</h2>
+                <div class="icon">${currentIcon}</div>
+                <p><strong>${currentData.current_weather.temperature}°C</strong></p>
+                <p>Wind: ${currentData.current_weather.windspeed} km/h</p>
+            </div>
+        `;
+        document.getElementById("current-weather").innerHTML = currentHtml;
+
+        // 3️⃣ Get daily forecast
+        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`;
         const weatherResponse = await fetch(weatherUrl);
         const weatherData = await weatherResponse.json();
 
-        const temp = weatherData.current.temperature_2m;
-        const code = weatherData.current.weather_code;
-        const icon = weatherIcons[code] || "❓";
-        const description = weatherDescriptions[code] || "Unknown weather";
+        // 4️⃣ Build HTML for the 7-day forecast
+        let html = `<h2>7 Day Forecast</h2>`;
+        html += `<div class="forecast-container">`;
 
-        // Display result with icon and description
-        weatherDiv.innerHTML = `
-      <h2>${placeName}</h2>
-      <p style="font-size: 2rem;">${icon}</p>
-      <p>${description}</p>
-      <p>Temperature: ${temp}°C</p>
-    `;
+        const days = weatherData.daily.time;
+        const maxTemps = weatherData.daily.temperature_2m_max;
+        const minTemps = weatherData.daily.temperature_2m_min;
+        const codes = weatherData.daily.weathercode;
+
+        for (let i = 0; i < days.length; i++) {
+            const date = new Date(days[i]);
+            const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
+            const icon = getWeatherIcon(codes[i]);
+
+            html += `
+                <div class="forecast-day">
+                    <h3>${dayName}</h3>
+                    <div class="icon">${icon}</div>
+                    <p>${minTemps[i]}°C / ${maxTemps[i]}°C</p>
+                </div>
+            `;
+        }
+
+        html += `</div>`;
+        document.getElementById("weather").innerHTML = html;
+
     } catch (error) {
-        weatherDiv.innerHTML = "Error fetching weather data.";
+        document.getElementById("weather").innerHTML = "Error fetching weather data.";
+        document.getElementById("current-weather").innerHTML = "";
         console.error(error);
     }
+}
+
+// Weather icon mapping
+function getWeatherIcon(code) {
+    const icons = {
+        0: "☀️",   // Clear sky
+        1: "🌤️",  // Mostly clear
+        2: "⛅",   // Partly cloudy
+        3: "☁️",   // Overcast
+        45: "🌫️", // Fog
+        48: "🌫️", // Fog
+        51: "🌦️", // Light rain
+        61: "🌧️", // Rain
+        71: "❄️", // Snow
+    };
+    return icons[code] || "❓";
 }
